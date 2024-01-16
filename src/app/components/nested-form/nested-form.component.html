@@ -1,0 +1,87 @@
+<form [formGroup]="form">
+  <mat-card class="invoice-form-card">
+    <mat-card-header>
+      <mat-card-title>Invoice Information</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div>
+        <mat-form-field>
+          <mat-label> Order Name </mat-label>
+          <input matInput type="text" formControlName="orderName" />
+        </mat-form-field>
+      </div>
+      <div formGroupName="order">
+        <div formArrayName="products">
+          <div class="product" *ngFor="let p of productsFormArray.controls; let i = index;trackBy: customTrackBy">
+            <div [formGroupName]="i">
+
+              <mat-form-field>
+                <mat-label> Product Name </mat-label>
+                <input matInput type="text" formControlName="productName" />
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label> Price </mat-label>
+                <input matInput type="text" formControlName="price" />
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label> Quantity </mat-label>
+                <input matInput type="text" formControlName="quantity" />
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label> Total </mat-label>
+                <input matInput type="text" formControlName="total" />
+              </mat-form-field>
+              <div formGroupName="taxes">
+                <div class="row" formArrayName="tax">
+                  <div
+                    class="tax"
+                    *ngFor="
+                    let t of taxesFormArray(i).controls;
+                    let j = index;
+                    track: t
+                    "
+                    >
+                    <div class="tax" [formGroupName]="j">
+                      <div class="row">
+                        <div class="col">
+                          <mat-form-field>
+                            <mat-label>Base</mat-label>
+                            <input matInput formControlName="base" />
+                          </mat-form-field>
+                        </div>
+                        <div class="col">
+                          <mat-form-field>
+                            <mat-label>Rate</mat-label>
+                            <input matInput formControlName="rate" />
+                          </mat-form-field>
+                        </div>
+                        <div class="col">
+                          <mat-form-field>
+                            <mat-label>Tax</mat-label>
+                            <input matInput formControlName="tax" />
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <mat-form-field>
+          <mat-label>SubTotal</mat-label>
+          <input matInput type="text" formControlName="subTotal" />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Taxes</mat-label>
+          <input matInput type="text" formControlName="taxes" />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Total</mat-label>
+          <input matInput type="text" formControlName="total" />
+        </mat-form-field>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</form>

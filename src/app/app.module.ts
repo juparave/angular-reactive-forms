@@ -11,11 +11,16 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
+
+
+import { NestedFormComponent } from './components/nested-form/nested-form.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    FormComponent
+    FormComponent,
+    NestedFormComponent
   ],
   imports: [
     BrowserModule,
@@ -29,6 +34,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     MatCardModule,
     MatInputModule,
     MatFormFieldModule,
+    MatButtonModule,
 
 
   ],

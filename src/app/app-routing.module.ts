@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { FormComponent } from './components/form/form.component';
 
 import { MatCardModule } from '@angular/material/card';
+import { NestedFormComponent } from './components/nested-form/nested-form.component';
 
 const routes: Routes = [
   {
@@ -13,6 +14,10 @@ const routes: Routes = [
   {
     path: 'form',
     component: FormComponent,
+  },
+  {
+    path: 'nested-form',
+    component: NestedFormComponent,
   }
 ];
 

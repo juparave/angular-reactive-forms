@@ -38,3 +38,7 @@ Add Material Design
 Create form component
 
     ng generate component components/form
+
+Create nested form component
+
+    ng generate component components/nested-form

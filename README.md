@@ -6,22 +6,74 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
-## Code scaffolding
+## Simple Form
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Updates taxes if price or quantity are modified.
 
-## Build
+Gets the form element `total` and listens to changes, then gets the `tax` control from the `taxes` `FormArray`
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+```ts
+this.form.get('total')?.valueChanges.subscribe((value: any) => {
+  // update taxes
+  const fg = this.form.get(['taxes', 'tax']) as FormArray;
+  fg.controls.forEach((control) => {
+    control.get('base')?.setValue(value);
+    control.get('tax')?.setValue(value * (control.get('rate')?.value || 0));
+  })
+})
+```
 
-## Running unit tests
+## Nested Form
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Updates taxes if price or quantity are modified and updates the total.
 
-## Running end-to-end tests
+Gets the `FormArray` order => products and listens to changes, then gets the `tax` control from the `taxes` `FormArray`
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+```ts
+const fa = this.form.get(['order', 'products']) as FormArray;
+    merge(...fa.controls.map((control: AbstractControl, index: number) =>
+      control.valueChanges.pipe(
+        debounceTime(300),
+        map(value => ({ index, control, value })))
+    ))
+      .subscribe(pfg => {
+        // console.log('valueChanges', pfg);
+        // console.log('value', pfg.value);
+        pfg.control.get('total')?.setValue(
+          pfg.control.get('price')?.value * pfg.control.get('quantity')?.value,
+          { emitEvent: false });
+        // update taxes
+        const taxesFG: FormGroup[] = [];
+        pfg.value.taxes.tax.forEach((tax: Tax) => {
+          tax.base = pfg.control.get('total')?.value;
+          // tax has two decimals only
+          tax.rate = Math.round(tax.rate * 100) / 100;
+          tax.tax = Math.round(tax.base * tax.rate * 100) / 100;
+          taxesFG.push(this.createTaxFormGroup(tax));
+        });
+        const fg = pfg.control.get(['taxes']) as FormGroup;
+        fg.setControl('tax', this.fb.array(taxesFG), { emitEvent: false });
+        fg.updateValueAndValidity({ emitEvent: false });
 
-## Further help
+        // update order
+        let subTotal = 0;
+        let taxes = 0;
+        let total = 0;
+        fa.controls.forEach((control: AbstractControl) => {
+          subTotal += control.get('total')?.value;
+          control.get(['taxes', 'tax'])?.value.forEach((tax: Tax) => {
+            taxes += tax.tax;
+          });
+        });
+        total = subTotal + taxes;
+        const order = this.form.get(['order']) as FormGroup;
+        order.get('subTotal')?.setValue(subTotal, { emitEvent: false });
+        order.get('taxes')?.setValue(taxes, { emitEvent: false });
+        order.get('total')?.setValue(total, { emitEvent: false });
+      });
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## References
+
+- [Angular FormArray: Complete Guide](https://blog.angular-university.io/angular-form-array/)
+- [How to identify which item in FormArray emitted valueChanges event?](https://stackoverflow.com/questions/53654938/how-to-identify-which-item-in-formarray-emitted-valuechanges-event)
